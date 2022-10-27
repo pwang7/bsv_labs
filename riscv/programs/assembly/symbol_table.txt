@@ -1,0 +1,2 @@
+_start    0x200
+exit      0x398
