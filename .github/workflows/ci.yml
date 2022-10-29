@@ -1,0 +1,21 @@
+name: CI
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  schedule: [cron: "*/30 * * * *"]
+
+jobs:
+  build-and-simulate:
+    name: Build and Simulate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: build and simulate
+        run : |
+          TEST_LOG="test.log"
+          ./run.sh 2>&1 | tee $TEST_LOG
+      - name: Setup tmate session
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3

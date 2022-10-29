@@ -1,6 +1,6 @@
 BSVBASEDIR=$(abspath ..)
 BASEDIR=$(abspath .)
-CONNECTALDIR=$(abspath ../../connectal-master)
+CONNECTALDIR=$(abspath ../../connectal)
 
 # Define HW->SW / SW->HW interfaces
 S2H_INTERFACES = MyDutRequest:MyDut.request

@@ -1,4 +1,4 @@
-CONNECTALDIR ?= $(abspath ../../connectal-master)
+CONNECTALDIR ?= $(abspath ../../connectal)
 BSVBASEDIR = $(abspath ..)/src
 BASEDIR = $(abspath .)
 
