@@ -34,20 +34,22 @@ module mkProc(Proc);
     Bool memReady = iMem.init.done() && dMem.init.done();
 
 	// TODO: complete implementation of this processor
-    Ehr#(2, Bit#(1)) epochReg <- mkEhrU;
-    Reg#(Maybe#(F2D)) f2d <- mkReg(tagged Invalid);
+    Reg#(Bit#(1)) epochReg <- mkRegU;
+    Fifo#(2, F2D) f2d <- mkPipelineFifo;
 
     rule doFetch if (csrf.started);
-        let inst = iMem.req(pc[1]);
-        let ppc = pc[1] + 4;
-        f2d <= tagged Valid F2D { inst: inst, pc: pc[1], ppc: ppc, epoch: epochReg[1] };
-        pc[1] <= ppc;
+        let inst = iMem.req(pc[0]);
+        let ppc = pc[0] + 4;
+        f2d.enq(F2D { inst: inst, pc: pc[0], ppc: ppc, epoch: epochReg });
+        pc[0] <= ppc;
 
         // trace - print the instruction
-        $display("fetch: PC=%h inst=(%h) expanded: ", pc[1], inst, showInst(inst));
+        $display("fetch: PC=%h inst=(%h) expanded: ", pc[0], inst, showInst(inst));
     endrule
 
-    rule doExecute if (csrf.started &&& f2d matches tagged Valid .ir);
+    rule doExecute if (csrf.started);
+        let ir = f2d.first;
+        f2d.deq;
         let irepoch = ir.epoch;
         let irinst = ir.inst;
         let irpc = ir.pc;
@@ -59,7 +61,7 @@ module mkProc(Proc);
         $display("decode: rVal1=%h, rVal2=%h, csrVal=%h", rVal1, rVal2, csrVal);
 
         let eInst  = exec(dInst, rVal1, rVal2, irpc, irppc, csrVal);
-        let wrongir = irepoch != epochReg[0];
+        let wrongir = irepoch != epochReg;
         $display("execute: wrongir=%b, eInst.brTaken=%b, eInst.addr=%h, ppc=%h", wrongir, eInst.brTaken, eInst.addr, irppc);
 
         if (!wrongir) begin
@@ -80,8 +82,8 @@ module mkProc(Proc);
             end
 
             if (eInst.mispredict) begin
-                pc[0] <= eInst.addr;
-                epochReg[0] <= epochReg[0] + 1'b1;
+                pc[1] <= eInst.addr;
+                epochReg <= epochReg + 1'b1;
             end
 
 

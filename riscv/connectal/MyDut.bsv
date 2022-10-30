@@ -23,9 +23,9 @@ import FourCycle::*;
 import TwoStage::*;
 `endif
 
-`ifdef TWOSTAGEBTB
-import TwoStageBtb::*;
-`endif
+// `ifdef TWOSTAGEBTB
+// import TwoStageBtb::*;
+// `endif
 
 interface MemInitRequest;
    method Action done();

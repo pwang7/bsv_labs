@@ -59,6 +59,11 @@ module mkProc(Proc);
         else if (eInst.iType == St) begin
             let d <- dMem.req(MemReq{op: St, addr: eInst.addr, data: eInst.data});
         end
+        else if (eInst.iType == Unsupported) begin
+            // check unsupported instruction at commit time. Exiting
+            $fwrite(stderr, "ERROR: Executing unsupported instruction at pc: %x. Exiting\n", pc);
+            $finish;
+        end
 
         if (isValid(eInst.dst)) begin
             rf.wr(fromMaybe(?, eInst.dst), eInst.data);
@@ -67,11 +72,6 @@ module mkProc(Proc);
         pc <= eInst.brTaken ? eInst.addr : ppc;
         stage <= Fetch;
 
-        // check unsupported instruction at commit time. Exiting
-        if(eInst.iType == Unsupported) begin
-            $fwrite(stderr, "ERROR: Executing unsupported instruction at pc: %x. Exiting\n", pc);
-            $finish;
-        end
 
 
 		// These codes are checking invalid CSR index
