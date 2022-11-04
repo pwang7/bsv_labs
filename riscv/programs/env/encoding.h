@@ -577,8 +577,8 @@
 #define CSR_MTIME 0x701
 #define CSR_MCPUID 0xf00
 #define CSR_MIMPID 0xf01
-#define CSR_MHARTID 0xf10
-#define CSR_MTOHOST 0x780
+#define CSR_MHARTID 0xf14
+#define CSR_MTOHOST 0x7b0
 #define CSR_MFROMHOST 0x781
 #define CSR_MRESET 0x782
 #define CSR_SEND_IPI 0x783
